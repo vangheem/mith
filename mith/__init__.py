@@ -4,7 +4,7 @@ import pydantic
 
 from ._base import BaseRepository
 from .alchemy import RowMapper, SQLAlchemyTableRepository
-from .config import mutation, query, Configuration, implements_api
+from .config import Configuration, implements_api, mutation, query
 
 
 def Reference(model_type: Type[pydantic.BaseModel]):

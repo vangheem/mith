@@ -1,5 +1,6 @@
 import pydantic
-import polymith
+
+import mith
 
 
 class User(pydantic.BaseModel):
@@ -8,6 +9,6 @@ class User(pydantic.BaseModel):
 
 
 class APIContract:
-    @polymith.mutation("addUser")
+    @mith.mutation("addUser")
     async def add_user(self, name: str) -> None:
         ...

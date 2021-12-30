@@ -1,7 +1,9 @@
-import polymith
-from pm_example.types.products import Product
 from typing import List
+
 import sqlalchemy
+
+import mith
+from mith.example.types.products import Product
 
 ProductsTable = sqlalchemy.Table(
     "products",
@@ -10,10 +12,10 @@ ProductsTable = sqlalchemy.Table(
     sqlalchemy.Column("name", sqlalchemy.String),
 )
 
-review_row_mapper = polymith.RowMapper(ProductsTable, Product)
+review_row_mapper = mith.RowMapper(ProductsTable, Product)
 
 
-class ProductsRepository(polymith.SQLAlchemyTableRepository):
+class ProductsRepository(mith.SQLAlchemyTableRepository):
     table = ProductsTable
 
     async def get_products(self) -> List[Product]:

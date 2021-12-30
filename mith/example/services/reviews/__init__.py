@@ -1,12 +1,12 @@
-import polymith
+import mith
+from mith.example.types.reviews import APIContract
 
 from .api import API
-from .settings import Settings
 from .repositories import ReviewsRepository
-from pm_example.types.reviews import APIContract
+from .settings import Settings
 
 
-def includeme(config: polymith.Configuration) -> None:
+def includeme(config: mith.Configuration) -> None:
     """
     Called on startup to configure service
     """
@@ -14,6 +14,6 @@ def includeme(config: polymith.Configuration) -> None:
         service_id="reviews",
         settings_type=Settings,
         repositories=[ReviewsRepository],
-        apis=[polymith.implements_api(APIContract, API)],
+        apis=[mith.implements_api(APIContract, API)],
         dependencies=["products", "users"],
     )

@@ -1,13 +1,15 @@
-from fastapi import FastAPI
 import os
+from typing import List
 
-from polymith.config import Configuration
 import ariadne
+import ariadne.asgi
 from ariadne.contrib.federation import make_federated_schema
 from ariadne.contrib.tracing.apollotracing import ApolloTracingExtension
-import ariadne.asgi
+from fastapi import FastAPI
+
+from mith.config import Configuration
+
 from ..gql import generate_graphql
-from typing import List
 
 
 class GraphQLApplication(FastAPI):

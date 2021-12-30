@@ -1,5 +1,6 @@
 import pydantic
-import polymith
+
+import mith
 
 
 class Product(pydantic.BaseModel):
@@ -8,6 +9,6 @@ class Product(pydantic.BaseModel):
 
 
 class APIContract:
-    @polymith.mutation("addProduct")
+    @mith.mutation("addProduct")
     async def add_product(self, name: str) -> None:
         ...

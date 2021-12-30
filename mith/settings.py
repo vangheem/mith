@@ -1,5 +1,6 @@
-from pydantic import BaseSettings
 from typing import Optional
+
+from pydantic import BaseSettings
 
 
 class PostgreSQLSettings(BaseSettings):
@@ -24,3 +25,8 @@ class PostgreSQLSettings(BaseSettings):
             f"postgres://{self.postgres_user}:{self.postgres_password}@"
             f"{self.postgres_writer_host}:{self.postgres_port}/{self.postgres_db}"
         )
+
+
+class HTTPSettings(BaseSettings):
+    host: str = "0.0.0.0"
+    port: int = 5000

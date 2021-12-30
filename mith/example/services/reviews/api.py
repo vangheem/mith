@@ -1,6 +1,7 @@
 from typing import List
 
-from pm_example.types.reviews import Review
+from mith.example.types.reviews import Review
+
 from .repositories import ReviewsRepository
 
 

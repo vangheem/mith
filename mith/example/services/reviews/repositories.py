@@ -1,9 +1,10 @@
-import polymith
-from pm_example.types.reviews import Review
 from typing import List
+
 import sqlalchemy
 import sqlalchemy.orm
 
+import mith
+from mith.example.types.reviews import Review
 
 ReviewsTable = sqlalchemy.Table(
     "reviews",
@@ -19,10 +20,10 @@ ReviewsTable = sqlalchemy.Table(
 )
 
 
-review_row_mapper = polymith.RowMapper(ReviewsTable, Review)
+review_row_mapper = mith.RowMapper(ReviewsTable, Review)
 
 
-class ReviewsRepository(polymith.SQLAlchemyTableRepository):
+class ReviewsRepository(mith.SQLAlchemyTableRepository):
     table = ReviewsTable
 
     async def get_reviews(self, author_id: str) -> List[Review]:

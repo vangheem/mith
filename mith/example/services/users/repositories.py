@@ -1,8 +1,9 @@
-import polymith
-from pm_example.types.users import User
 from typing import List
+
 import sqlalchemy
 
+import mith
+from mith.example.types.users import User
 
 UsersTable = sqlalchemy.Table(
     "users",
@@ -12,10 +13,10 @@ UsersTable = sqlalchemy.Table(
 )
 
 
-review_row_mapper = polymith.RowMapper[User](UsersTable, User)
+review_row_mapper = mith.RowMapper[User](UsersTable, User)
 
 
-class UsersRepository(polymith.SQLAlchemyTableRepository):
+class UsersRepository(mith.SQLAlchemyTableRepository):
     table = UsersTable
 
     async def get_users(self) -> List[User]:

@@ -1,10 +1,9 @@
-from typing import List, TypeVar, Any
+import abc
 import os
+from typing import Any, List, TypeVar
 
 from .types import RepoType, SettingType
 from .utils import resolve_dotted_name
-import abc
-
 
 PassThroughDecType = TypeVar("PassThroughDecType")
 

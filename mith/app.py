@@ -1,4 +1,5 @@
-from polymith.config import Configuration
+from mith.config import Configuration
+
 from .service import GraphQLApplication
 
 

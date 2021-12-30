@@ -1,5 +1,5 @@
 [tool.poetry]
-name = "polymith"
+name = "mith"
 version = "0.1.0"
 description = ""
 authors = ["Nathan Van Gheem <vangheem@gmail.com>"]
@@ -28,7 +28,7 @@ pytest-asyncio = "^0.16.0"
 
 
 [tool.poetry.scripts]
-mith = 'polymith.commands:main'
+mith = 'mith.commands:main'
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]

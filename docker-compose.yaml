@@ -1,0 +1,11 @@
+version: '3'
+services:
+  postgresql2:
+    image: postgres:13.2
+    ports:
+      - 5432:5432
+    environment:
+      - POSTGRES_PASSWORD=postgres
+
+volumes:
+  sock-volume: null

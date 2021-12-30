@@ -1,11 +1,11 @@
-from typing import Type, Union, TypeVar, Generic
-from asyncpg import Record
-import pydantic
+from typing import Generic, Type, TypeVar, Union
 
 import asyncpg
+import pydantic
 import sqlalchemy
 import sqlalchemy.orm
 import sqlalchemy.sql
+from asyncpg import Record
 
 from .._base import BaseRepository
 from ..settings import PostgreSQLSettings

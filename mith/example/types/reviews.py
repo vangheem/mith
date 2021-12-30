@@ -1,7 +1,8 @@
 from typing import List
 
-import polymith
 import pydantic
+
+import mith
 
 from .products import Product
 from .users import User
@@ -10,15 +11,15 @@ from .users import User
 class Review(pydantic.BaseModel):
     id: str
     body: str
-    author: User = polymith.Reference(User)
-    product: Product = polymith.Reference(Product)
+    author: User = mith.Reference(User)
+    product: Product = mith.Reference(Product)
 
 
 class APIContract:
-    @polymith.query("getReviews")
+    @mith.query("getReviews")
     async def get_reviews(self, author_id: str) -> List[Review]:
         ...
 
-    @polymith.mutation("addReview")
+    @mith.mutation("addReview")
     async def add_review(self, author_id: str, body: str, product_id: str) -> None:
         ...
