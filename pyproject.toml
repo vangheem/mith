@@ -1,0 +1,35 @@
+[tool.poetry]
+name = "polymith"
+version = "0.1.0"
+description = ""
+authors = ["Nathan Van Gheem <vangheem@gmail.com>"]
+
+[tool.poetry.dependencies]
+python = "^3.9"
+fastapi = "<0.70.0"
+ariadne = "^0.13.0"
+databases = {extras = ["asyncpg"], version = "^0.5.3"}
+cookiecutter = "^1.7.3"
+uvicorn = "^0.15.0"
+python-dotenv = "^0.19.2"
+pydantic = "^1.8.2"
+typer = "^0.4.0"
+SQLAlchemy = {extras = ["mypy"], version = "^1.4.29"}
+asyncpg = "^0.25.0"
+orjson = "^3.6.5"
+
+[tool.poetry.dev-dependencies]
+pytest = "^5.2"
+pytest-cov = "^3.0.0"
+black = "^21.11b1"
+flake8 = "^4.0.1"
+mypy = "^0.910"
+pytest-asyncio = "^0.16.0"
+
+
+[tool.poetry.scripts]
+mith = 'polymith.commands:main'
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"

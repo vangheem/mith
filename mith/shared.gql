@@ -1,0 +1,14 @@
+interface ErrorType {
+    reason: String
+    message: String
+}
+
+
+interface Node {
+    id: String!
+}
+
+type PageInfo {
+    hasNextPage: Boolean!
+    endCursor: String
+}
