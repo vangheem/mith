@@ -1,11 +1,12 @@
 from typing import Optional
-from mith.settings import HTTPSettings
+
 import dotenv
 import typer
 import uvicorn
 
 from mith.app import create_app
 from mith.config import load_configuration_from_environment
+from mith.settings import HTTPSettings
 
 main = typer.Typer()
 

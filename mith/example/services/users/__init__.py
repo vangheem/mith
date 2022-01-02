@@ -1,5 +1,5 @@
 import mith
-from mith.example.types.products import APIContract
+from mith.example.types.users import APIContract
 
 from .api import API
 from .repositories import UsersRepository

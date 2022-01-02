@@ -1,12 +1,14 @@
-from typing import List
+from typing import List, Optional
 
-from mith.example.types.reviews import Review
+from mith.example.types.products import Product
 
 from .repositories import ProductsRepository
 
 
 class API:
-    async def get_reviews(
-        self, repo: ProductsRepository, author_id: str
-    ) -> List[Review]:
-        return repo.get_products(author_id=author_id)
+    async def get_products(self, repo: ProductsRepository) -> List[Product]:
+        return await repo.get_products()
+
+    async def add_product(self, repo: ProductsRepository, name: str) -> Optional[str]:
+        await repo.add_product(name)
+        return "success"

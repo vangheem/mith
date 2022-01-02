@@ -8,7 +8,7 @@ from .config import Configuration, implements_api, mutation, query
 
 
 def Reference(model_type: Type[pydantic.BaseModel]):
-    return pydantic.Field(model_type=model_type)
+    return pydantic.Field(reference=True, model_type=model_type)
 
 
 __all__ = (

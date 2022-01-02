@@ -1,10 +1,12 @@
+import uuid
 from typing import List
 
+import asyncpg
 import sqlalchemy
 import sqlalchemy.orm
+from pydantic.main import BaseModel
 
 import mith
-from mith.example.types.reviews import Review
 
 ReviewsTable = sqlalchemy.Table(
     "reviews",
@@ -12,15 +14,32 @@ ReviewsTable = sqlalchemy.Table(
     sqlalchemy.Column("id", sqlalchemy.String, primary_key=True),
     sqlalchemy.Column("body", sqlalchemy.String),
     sqlalchemy.Column(
-        "author_id", sqlalchemy.String, sqlalchemy.ForeignKey("author.id")
+        "author_id", sqlalchemy.String, sqlalchemy.ForeignKey("users.id")
     ),
     sqlalchemy.Column(
-        "product_id", sqlalchemy.String, sqlalchemy.ForeignKey("product.id")
+        "product_id", sqlalchemy.String, sqlalchemy.ForeignKey("products.id")
     ),
 )
 
 
-review_row_mapper = mith.RowMapper(ReviewsTable, Review)
+class Reference(BaseModel):
+    id: str
+
+
+class Review(BaseModel):
+    id: str
+    body: str
+    author: Reference
+    product: Reference
+
+
+def review_row_mapper(record: asyncpg.Record) -> Review:
+    return Review(
+        id=record["id"],
+        body=record["body"],
+        author=Reference(id=record["author_id"]),
+        product=Reference(id=record["product_id"]),
+    )
 
 
 class ReviewsRepository(mith.SQLAlchemyTableRepository):
@@ -29,5 +48,17 @@ class ReviewsRepository(mith.SQLAlchemyTableRepository):
     async def get_reviews(self, author_id: str) -> List[Review]:
         return [
             review_row_mapper(row_model)
-            for row_model in await self.query.filter(author_id == author_id)
+            for row_model in await self.fetch(
+                self.table.select().filter(author_id == author_id)
+            )
         ]
+
+    async def add_review(self, author_id: str, body: str, product_id: str) -> str:
+        await self.execute(
+            self.table.insert().values(
+                id=uuid.uuid4().hex,
+                author_id=author_id,
+                body=body,
+                product_id=product_id,
+            )
+        )

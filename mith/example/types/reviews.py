@@ -1,4 +1,4 @@
-from typing import List
+from typing import List, Optional
 
 import pydantic
 
@@ -21,5 +21,7 @@ class APIContract:
         ...
 
     @mith.mutation("addReview")
-    async def add_review(self, author_id: str, body: str, product_id: str) -> None:
+    async def add_review(
+        self, author_id: str, body: str, product_id: str
+    ) -> Optional[str]:
         ...

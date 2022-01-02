@@ -1,3 +1,5 @@
+from typing import List, Optional
+
 import pydantic
 
 import mith
@@ -9,6 +11,10 @@ class Product(pydantic.BaseModel):
 
 
 class APIContract:
+    @mith.query("getProducts")
+    async def get_products(self) -> List[Product]:
+        ...
+
     @mith.mutation("addProduct")
-    async def add_product(self, name: str) -> None:
+    async def add_product(self, name: str) -> Optional[str]:
         ...

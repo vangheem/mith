@@ -1,3 +1,4 @@
+import uuid
 from typing import List
 
 import sqlalchemy
@@ -19,4 +20,10 @@ class ProductsRepository(mith.SQLAlchemyTableRepository):
     table = ProductsTable
 
     async def get_products(self) -> List[Product]:
-        return [review_row_mapper(row_model) for row_model in await self.query.all()]
+        return [
+            review_row_mapper(row_model)
+            for row_model in await self.fetch(self.table.select())
+        ]
+
+    async def add_product(self, name: str) -> None:
+        await self.execute(self.table.insert().values(id=uuid.uuid4().hex, name=name))

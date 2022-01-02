@@ -27,3 +27,12 @@ class GraphQLApplication(FastAPI):
                 extensions=[ApolloTracingExtension],
             ),
         )
+
+        self.add_event_handler("startup", self.initialize)
+        self.add_event_handler("shutdown", self.finalize)
+
+    async def initialize(self) -> None:
+        await self.configuration.initialize()
+
+    async def finalize(self) -> None:
+        await self.configuration.finalize()

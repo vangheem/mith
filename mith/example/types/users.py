@@ -1,3 +1,5 @@
+from typing import List, Optional
+
 import pydantic
 
 import mith
@@ -9,6 +11,10 @@ class User(pydantic.BaseModel):
 
 
 class APIContract:
+    @mith.query("getUsers")
+    async def get_users(self) -> List[User]:
+        ...
+
     @mith.mutation("addUser")
-    async def add_user(self, name: str) -> None:
+    async def add_user(self, name: str) -> Optional[str]:
         ...

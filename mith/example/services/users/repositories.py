@@ -1,3 +1,4 @@
+import uuid
 from typing import List
 
 import sqlalchemy
@@ -20,4 +21,10 @@ class UsersRepository(mith.SQLAlchemyTableRepository):
     table = UsersTable
 
     async def get_users(self) -> List[User]:
-        return [review_row_mapper(row_model) for row_model in await self.query.all()]
+        return [
+            review_row_mapper(row_model)
+            for row_model in await self.fetch(self.table.select())
+        ]
+
+    async def add_user(self, name: str) -> None:
+        await self.execute(self.table.insert().values(id=uuid.uuid4().hex, name=name))
