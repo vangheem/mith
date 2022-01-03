@@ -12,3 +12,6 @@ class API:
     async def add_user(self, repo: UsersRepository, name: str) -> Optional[str]:
         await repo.add_user(name)
         return "success"
+
+    async def resolve_user(self, repo: UsersRepository, id: str) -> Optional[User]:
+        return await repo.get_user(id=id)

@@ -18,15 +18,18 @@ class GraphQLApplication(FastAPI):
 
         self.configuration = configuration
 
-        objects, schema = generate_graphql(configuration)
+        for service in configuration.services:
+            objects, schema = generate_graphql(configuration, service)
 
-        self.mount(
-            "/graphql",
-            ariadne.asgi.GraphQL(
-                make_federated_schema(schema, *objects, directives={}),
-                extensions=[ApolloTracingExtension],
-            ),
-        )
+            mount_path = f"/{service.service_id}"
+            self.mount(
+                mount_path,
+                ariadne.asgi.GraphQL(
+                    make_federated_schema(schema, *objects, directives={}),
+                    extensions=[ApolloTracingExtension],
+                ),
+            )
+            print(f"Mounting {mount_path}")
 
         self.add_event_handler("startup", self.initialize)
         self.add_event_handler("shutdown", self.finalize)

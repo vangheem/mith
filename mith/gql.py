@@ -4,9 +4,15 @@ import os
 import typing
 
 from ariadne.contrib import federation
+import pydantic
 from pydantic.main import BaseModel
 
-from mith.config import APIDefinition, Configuration, call_injectable
+from mith.config import (
+    APIDefinition,
+    Configuration,
+    ServiceConfiguration,
+    call_injectable,
+)
 
 from .const import EndpointType
 
@@ -86,12 +92,29 @@ def generate_gql_type_signature(type_: typing.Any) -> str:
 
 def generate_gql_type_from_pydantic(type_: typing.Type[BaseModel]) -> str:
     fields = []
-    for f_name in type_.__fields__.keys():
+    primary_keys = []
+    reference = getattr(type_.__config__, "reference", False)
+    for f_name, field in type_.__fields__.items():
         type_sig = type_.__annotations__[f_name]
-        fields.append(f"{f_name}: {generate_gql_type_signature(type_sig)}")
+        f_str = f"{f_name}: {generate_gql_type_signature(type_sig)}"
+
+        if field.field_info.extra.get("primary_key"):
+            primary_keys.append(f_name)
+            if reference:
+                f_str += " @external"
+
+        fields.append(f_str)
+
     fields_str = "\n  ".join(fields)
 
-    return f"""type {type_.__name__} {{
+    extra_str = ""
+    if len(primary_keys) > 0:
+        extra_str = f'@key(fields: "{" ".join(primary_keys)}")'
+
+    if reference:
+        extra_str += f" @extends"
+
+    return f"""type {type_.__name__} {extra_str} {{
   {fields_str}
 }}"""
 
@@ -117,6 +140,10 @@ class APIEndpiont:
         return values
 
     @property
+    def model_type(self) -> typing.Type[pydantic.BaseModel]:
+        return self.func.__mith__["model_type"]
+
+    @property
     def returns(self) -> typing.Any:
         return self.func.__annotations__.get("return")
 
@@ -130,10 +157,19 @@ class APIEndpiont:
             impl, self.configuration, {"context": context, **kwargs}
         )
 
+    async def reference_resolver(self, _, context, representation) -> typing.Any:
+        result = await self(context, **representation)
+        if result is not None and isinstance(result, BaseModel):
+            data = result.dict()
+            data["__typename"] = self.model_type.__name__
+            return data
+        return result
+
 
 class _GraphQLGenerator:
-    def __init__(self, configuration: Configuration):
+    def __init__(self, configuration: Configuration, service: ServiceConfiguration):
         self.configuration = configuration
+        self.service = service
         self.objects = {
             "query": federation.FederatedObjectType("Query"),
         }
@@ -151,25 +187,25 @@ class _GraphQLGenerator:
         mutations = []
         mutation_object = federation.FederatedObjectType("Mutation")
 
-        for service in self.configuration.services:
-            for api in service.apis:
-                objects_types = self.generate_api_gql_types(api)
-                if len(objects_types) > 0:
-                    for type_name, type_def in objects_types.items():
-                        if type_name in self.objects:
-                            if types[type_name] != type_def:
-                                raise TypeConflictError(
-                                    f"Type names must to be unique:\n{types[type_name]} != {type_def}"
-                                )
-                            continue
-                        types[type_name] = type_def
-                    self.objects[type_name] = federation.FederatedObjectType(type_name)
+        for api in self.service.apis:
+            objects_types = self.generate_api_gql_types(api)
+            if len(objects_types) > 0:
+                for type_name, type_def in objects_types.items():
+                    if type_name in self.objects:
+                        if types[type_name] != type_def:
+                            raise TypeConflictError(
+                                f"Type names must to be unique:\n{types[type_name]} != {type_def}"
+                            )
+                        continue
+                    types[type_name] = type_def
+                self.objects[type_name] = federation.FederatedObjectType(type_name)
 
-                queries.extend(self.generate_api_queries(api, self.objects["query"]))
-                mutations.extend(self.generate_api_mutations(api, mutation_object))
+            queries.extend(self.generate_api_queries(api, self.objects["query"]))
+            mutations.extend(self.generate_api_mutations(api, mutation_object))
+            self.wire_resolvers(api)
 
         for type_name, type_def in types.items():
-            schema += f"# Generated Type: {type_name}\n\n{type_def}\n"
+            schema += f"# Generated Type: {type_name}\n{type_def}\n"
 
         if len(queries) == 0:
             # need to have something
@@ -177,8 +213,8 @@ class _GraphQLGenerator:
 
         query_str = "\n  ".join(queries)
         schema += f"""type Query {{
-    {query_str}
-    }}
+  {query_str}
+}}
 
     """
 
@@ -186,12 +222,13 @@ class _GraphQLGenerator:
             self.objects["mutation"] = mutation_object
             mutations_str = "\n  ".join(mutations)
             schema += f"""type Mutation {{
-    {mutations_str}
-    }}
+  {mutations_str}
+}}
 
     """
 
         logger.debug(schema)
+        print(f"Schema {self.service.service_id}:\n {schema}")
 
         return list(self.objects.values()), schema
 
@@ -262,9 +299,20 @@ class _GraphQLGenerator:
             mutation_object.field(endpoint.name)(endpoint)
         return queries
 
+    def wire_resolvers(self, api: APIDefinition) -> typing.List[str]:
+        queries = []
+        for endpoint in self.iter_api_contract(api):
+            if endpoint.type != EndpointType.RESOLVE_REFERENCE:
+                continue
+
+            self.objects[endpoint.model_type.__name__].reference_resolver(
+                endpoint.reference_resolver
+            )
+        return queries
+
 
 def generate_graphql(
-    configuration: Configuration,
+    configuration: Configuration, service: ServiceConfiguration
 ) -> typing.Tuple[typing.List[federation.FederatedObjectType], str]:
-    gen = _GraphQLGenerator(configuration)
+    gen = _GraphQLGenerator(configuration, service)
     return gen()

@@ -1,11 +1,49 @@
 version: '3'
 services:
-  postgresql2:
+  postgresql:
     image: postgres:13.2
     ports:
       - 5432:5432
     environment:
       - POSTGRES_PASSWORD=postgres
+  app:
+    build:
+      context: .
+    stdin_open: true # docker run -i
+    tty: true # docker run -t
+    volumes:
+      - ${PWD}:/app
+    ports:
+      - 5000:5000
+    expose:
+      - 5000
+    depends_on:
+      - postgresql
+    links:
+      - postgresql
+    environment:
+      - SERVICE_REVIEWS=mith.example.services.reviews
+      - SERVICE_PRODUCTS=mith.example.services.products
+      - SERVICE_USERS=mith.example.services.users
+      - postgres_writer_host=postgresql
+      - postgres_db=postgres
+      - postgres_user=postgres
+      - postgres_password=postgres
+  gateway:
+    image: graphql/gateway
+    ports:
+      - 8080:80
+    restart: always
+    links:
+      - app
+    depends_on:
+      - app
+    environment:
+      - GRAPHQL_URL_0=http://app:5000/reviews/
+      - GRAPHQL_URL_1=http://app:5000/products/
+      - GRAPHQL_URL_2=http://app:5000/users/
+      - GRAPHQL_UPDATE_GATEWAY=true
+      - GRAPHQL_UPDATE_GATEWAY_INTERVAL_MS=60000
 
 volumes:
   sock-volume: null

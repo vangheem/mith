@@ -5,6 +5,7 @@ import asyncpg
 import sqlalchemy
 import sqlalchemy.orm
 from pydantic.main import BaseModel
+from mith.example.types.reviews import Review, UserReference, ProductReference
 
 import mith
 
@@ -22,23 +23,12 @@ ReviewsTable = sqlalchemy.Table(
 )
 
 
-class Reference(BaseModel):
-    id: str
-
-
-class Review(BaseModel):
-    id: str
-    body: str
-    author: Reference
-    product: Reference
-
-
 def review_row_mapper(record: asyncpg.Record) -> Review:
     return Review(
         id=record["id"],
         body=record["body"],
-        author=Reference(id=record["author_id"]),
-        product=Reference(id=record["product_id"]),
+        author=UserReference(id=record["author_id"]),
+        product=ProductReference(id=record["product_id"]),
     )
 
 

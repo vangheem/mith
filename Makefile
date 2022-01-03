@@ -44,11 +44,11 @@ coverage-dev: ## Create coverage report for DEV environment
 send-codecov:
 	$(POETRY) run codecov --url="https://open-coverage.org/api" --token=- --slug=vangheem/mith --file=coverage.xml -F project:api
 
-run: ## Run Open Coverage
-	$(POETRY) run mith
+run: ## Run Mith
+	$(POETRY) run mith run
 
-run-dev: ## Run Open Coverage DEV environment
-	$(POETRY) run mith -e .env.dev
+run-dev: ## Run Mith DEV environment
+	$(POETRY) run mith run -env=.env
 
 
 .PHONY: clean install test coverage run run-dev help

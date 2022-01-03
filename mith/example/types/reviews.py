@@ -8,11 +8,15 @@ from .products import Product
 from .users import User
 
 
+UserReference = mith.Reference(User)
+ProductReference = mith.Reference(Product)
+
+
 class Review(pydantic.BaseModel):
-    id: str
+    id: str = mith.PrimaryKey()
     body: str
-    author: User = mith.Reference(User)
-    product: Product = mith.Reference(Product)
+    author: UserReference
+    product: ProductReference
 
 
 class APIContract:

@@ -1,9 +1,10 @@
 import abc
 import inspect
 import os
-from typing import Any, Dict, List, Optional, TypeVar
+from typing import Any, Dict, List, Optional, TypeVar, Type
 
 import asyncpg
+import pydantic
 
 from mith.settings import PostgreSQLSettings
 
@@ -40,6 +41,20 @@ class mutation(_config_decorator):
 
     def register(self, func: PassThroughDecType):
         func.__mith__.update({"type": EndpointType.MUTATION, "name": self.name})
+
+
+class resolve_reference(_config_decorator):
+    def __init__(self, model_type: Type[pydantic.BaseModel]):
+        self.model_type = model_type
+
+    def register(self, func: PassThroughDecType):
+        func.__mith__.update(
+            {
+                "type": EndpointType.RESOLVE_REFERENCE,
+                "model_type": self.model_type,
+                "name": f"Resolve{self.model_type.__name__}",
+            }
+        )
 
 
 class APIDefinition:

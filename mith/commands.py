@@ -22,7 +22,11 @@ def run(env: Optional[str] = None):
     config = load_configuration_from_environment()
     app = create_app(config)
     http_settings = HTTPSettings()
-    return uvicorn.run(app, host=http_settings.host, port=http_settings.port)
+    return uvicorn.run(
+        app,
+        host=http_settings.host,
+        port=http_settings.port,
+    )
 
 
 @main.command()

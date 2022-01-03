@@ -12,3 +12,8 @@ class API:
     async def add_product(self, repo: ProductsRepository, name: str) -> Optional[str]:
         await repo.add_product(name)
         return "success"
+
+    async def resolve_product(
+        self, repo: ProductsRepository, id: str
+    ) -> Optional[Product]:
+        return await repo.get_product(id=id)

@@ -6,7 +6,7 @@ import mith
 
 
 class Product(pydantic.BaseModel):
-    id: str
+    id: str = mith.PrimaryKey()
     name: str
 
 
@@ -17,4 +17,8 @@ class APIContract:
 
     @mith.mutation("addProduct")
     async def add_product(self, name: str) -> Optional[str]:
+        ...
+
+    @mith.resolve_reference(Product)
+    async def resolve_product(self, id: str) -> Optional[Product]:
         ...
