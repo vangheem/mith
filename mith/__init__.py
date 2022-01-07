@@ -1,7 +1,6 @@
 from typing import Type
 
 import pydantic
-
 from ._base import BaseRepository
 from .alchemy import RowMapper, SQLAlchemyTableRepository
 from .config import Configuration, implements_api, mutation, query, resolve_reference
